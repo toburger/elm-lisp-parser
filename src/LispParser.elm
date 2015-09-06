@@ -6,12 +6,27 @@ module LispParser (
   , Value(..)
   , Op(..)) where
 
+{-| This library provides parser of simple-lisp-syntax and its AST data-structure.
+Converting AST to String of lisp-expression is also supported.
+
+# Definition
+@docs Exp, VarName, Value, Op
+
+# Lisp-expression to AST
+@docs read
+
+# AST to Lisp-expression
+@docs print
+
+-}
+
 import Parser exposing (..)
 import Parser.Char as PChar
 import Parser.Number as PNumber
 import List as List
 import String exposing(fromList, concat)
 
+{-| Expression (AST) type -}
 type Exp = Lambda (List VarName) Exp
   | If Exp Exp Exp
   | Set VarName Exp
@@ -19,24 +34,31 @@ type Exp = Lambda (List VarName) Exp
   | OpApply Op (List Exp)
   | Literal Value
   | VarRef VarName
+
+{-| Variable type -}
 type VarName = VarName String
+
+{-| Value type -}
 type Value = IntValue Int
+
+{-| Operator type -}
 type Op = Add | Sub | Mul | Div
 
--- exported apis
+{-| Parse Lisp-expression -}
 read : String -> Maybe Exp
 read inp =
     case parse exp inp of
         Ok e -> Just e
         otherwise -> Nothing
 
+{-| Describe Lisp-expression -}
 print : Exp -> String
 print exp = case exp of
     Lambda vs e  -> "(lambda (" ++ (String.concat << (List.intersperse " ")) (List.map printVar vs) ++ ") " ++ print e ++ ")"
     If e0 e1 e2  -> "(if " ++ print e0 ++ " " ++ print e1 ++ " " ++ print e2 ++ ")"
     Set v e      -> "(set! " ++ printVar v ++ " " ++ print e ++ ")"
-    Apply e es   -> "(" ++ print e ++ " " ++ (String.concat << (List.intersperse " ")) (List.map print es) ++ ")"
-    OpApply o es -> "(" ++ printOp o ++ " " ++ (String.concat << (List.intersperse " ")) (List.map print es) ++ ")"
+    Apply e es   -> "(" ++ (String.concat << (List.intersperse " ")) (print e :: List.map print es) ++ ")"
+    OpApply o es -> "(" ++ (String.concat << (List.intersperse " ")) (printOp o :: List.map print es) ++ ")"
     Literal v    -> printVal v
     VarRef v     -> printVar v
 
@@ -87,14 +109,14 @@ set =
 apply : Parser Exp
 apply =
     map Apply exp
-    |> andMap (some exp) -- : Parser Exp
+    |> andMap (many exp) -- : Parser Exp
     |> PChar.parenthesized
     |> tokenize
 
 opApply : Parser Exp
 opApply =
     map OpApply (tokenize op) -- : Parser ([Exp] -> Exp)
-    |> andMap (some exp) -- : Parser Exp
+    |> andMap (many exp) -- : Parser Exp
     |> PChar.parenthesized
     |> tokenize
 
