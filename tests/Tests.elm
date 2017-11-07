@@ -10,15 +10,15 @@ singleCase =
     describe "LispParser parsing single-exp Test"
         [ test "parse lmabda" <|
             \_ ->
-                Expect.equal (Just (Lambda [ VarName "x", VarName "y" ] (Literal (IntValue 1)))) <|
+                Expect.equal (Just (Lambda [ VarName "x", VarName "y" ] (Literal (FloatValue 1)))) <|
                     read "(lambda (x y) 1)"
         , test "parse if" <|
             \_ ->
-                Expect.equal (Just (If (Literal (IntValue 1)) (Literal (IntValue 2)) (Literal (IntValue 3)))) <|
+                Expect.equal (Just (If (Literal (FloatValue 1)) (Literal (FloatValue 2)) (Literal (FloatValue 3)))) <|
                     read "(if 1 2 3)"
         , test "parse set!" <|
             \_ ->
-                Expect.equal (Just (Set (VarName "v") (Literal (IntValue 1)))) <|
+                Expect.equal (Just (Set (VarName "v") (Literal (FloatValue 1)))) <|
                     read "(set! v 1)"
         , test "parse apply0" <|
             \_ ->
@@ -26,7 +26,7 @@ singleCase =
                     read "(f)"
         , test "parse apply1" <|
             \_ ->
-                Expect.equal (Just (Apply (VarRef (VarName "f")) [ Literal (IntValue 1) ])) <|
+                Expect.equal (Just (Apply (VarRef (VarName "f")) [ Literal (FloatValue 1) ])) <|
                     read "(f 1)"
         , test "parse opApply0" <|
             \_ ->
@@ -34,7 +34,7 @@ singleCase =
                     read "(+)"
         , test "parse opApply1" <|
             \_ ->
-                Expect.equal (Just (OpApply Add [ Literal (IntValue 1) ])) <|
+                Expect.equal (Just (OpApply Add [ Literal (FloatValue 1) ])) <|
                     read "(+ 1)"
         ]
 
@@ -45,15 +45,15 @@ printTest =
         [ test "print lmabda" <|
             \_ ->
                 Expect.equal "(lambda (x y) 1)" <|
-                    print (Lambda [ VarName "x", VarName "y" ] (Literal (IntValue 1)))
+                    print (Lambda [ VarName "x", VarName "y" ] (Literal (FloatValue 1)))
         , test "print if" <|
             \_ ->
                 Expect.equal "(if 1 2 3)" <|
-                    print (If (Literal (IntValue 1)) (Literal (IntValue 2)) (Literal (IntValue 3)))
+                    print (If (Literal (FloatValue 1)) (Literal (FloatValue 2)) (Literal (FloatValue 3)))
         , test "print set!" <|
             \_ ->
                 Expect.equal "(set! v 1)" <|
-                    print (Set (VarName "v") (Literal (IntValue 1)))
+                    print (Set (VarName "v") (Literal (FloatValue 1)))
         , test "print apply0" <|
             \_ ->
                 Expect.equal "(f)" <|
@@ -61,7 +61,7 @@ printTest =
         , test "print apply1" <|
             \_ ->
                 Expect.equal "(f 1)" <|
-                    print (Apply (VarRef (VarName "f")) [ Literal (IntValue 1) ])
+                    print (Apply (VarRef (VarName "f")) [ Literal (FloatValue 1) ])
         , test "print opApply0" <|
             \_ ->
                 Expect.equal "(+)" <|
@@ -69,5 +69,5 @@ printTest =
         , test "print opApply1" <|
             \_ ->
                 Expect.equal "(+ 1)" <|
-                    print (OpApply Add [ Literal (IntValue 1) ])
+                    print (OpApply Add [ Literal (FloatValue 1) ])
         ]

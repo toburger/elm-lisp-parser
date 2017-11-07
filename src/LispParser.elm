@@ -54,7 +54,7 @@ type VarName
 {-| Value type
 -}
 type Value
-    = IntValue Int
+    = FloatValue Float
 
 
 {-| Operator type
@@ -111,7 +111,7 @@ printVar (VarName s) =
 
 
 printVal : Value -> String
-printVal (IntValue i) =
+printVal (FloatValue i) =
     toString i
 
 
@@ -225,7 +225,7 @@ op =
 
 intValue : Parser Value
 intValue =
-    map IntValue PNumber.int
+    map FloatValue (PNumber.float <|> map toFloat PNumber.int)
 
 
 varName : Parser VarName
