@@ -25,10 +25,10 @@ interpretOp op =
             ( (/), 1 )
 
         Max ->
-            ( max, -2147483648 )
+            ( max, 1 / 0 )
 
         Min ->
-            ( min, 2147483647 )
+            ( min, -(1 / 0) )
 
 
 extractValues : List Exp -> List Float
@@ -87,14 +87,14 @@ interpret env exp =
 
         OpApply op exps ->
             let
-                ( opf, base ) =
+                ( operation, identity ) =
                     interpretOp op
 
                 values =
                     extractValues exps
 
                 value =
-                    List.foldr opf base values
+                    List.foldr operation identity values
             in
                 floatLit value
 
