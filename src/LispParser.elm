@@ -42,6 +42,7 @@ type Exp
     | Apply Exp (List Exp)
     | OpApply Op (List Exp)
     | Literal Value
+    | List (List Exp)
     | VarRef VarName
 
 
@@ -64,6 +65,8 @@ type Op
     | Sub
     | Mul
     | Div
+    | Max
+    | Min
 
 
 {-| Parse Lisp-expression
@@ -101,6 +104,9 @@ print exp =
         Literal v ->
             printVal v
 
+        List es ->
+            "(" ++ (String.concat << (List.intersperse " ")) (List.map print es) ++ ")"
+
         VarRef v ->
             printVar v
 
@@ -130,6 +136,12 @@ printOp op =
         Div ->
             "/"
 
+        Max ->
+            "max"
+
+        Min ->
+            "min"
+
 
 
 -- Exp Parser
@@ -137,7 +149,15 @@ printOp op =
 
 exp : Parser Exp
 exp =
-    lazy (\() -> choice [ lambda, if_, set, apply, opApply, literal, varRef ])
+    lazy (\() -> choice [ lambda, if_, set, opApply, list, apply, literal, varRef ])
+
+
+list : Parser Exp
+list =
+    many literal
+        |> map List
+        |> parens
+        |> tokenize
 
 
 lambda : Parser Exp
@@ -212,10 +232,10 @@ op : Parser Op
 op =
     let
         ops =
-            [ Add, Sub, Mul, Div ]
+            [ Add, Sub, Mul, Div, Max, Min ]
 
         toks =
-            [ "+", "-", "*", "/" ]
+            [ "+", "-", "*", "/", "max", "min" ]
 
         p op tok =
             map (always op) (string tok)

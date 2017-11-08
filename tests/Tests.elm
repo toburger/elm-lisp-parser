@@ -36,6 +36,14 @@ singleCase =
             \_ ->
                 Expect.equal (Just (OpApply Add [ Literal (FloatValue 1) ])) <|
                     read "(+ 1)"
+        , test "parse list" <|
+            \_ ->
+                Expect.equal (Just (List [ Literal (FloatValue 1), Literal (FloatValue 2), Literal (FloatValue 3) ])) <|
+                    read "(1 2 3)"
+        , test "parse empty list" <|
+            \_ ->
+                Expect.equal (Just (List [])) <|
+                    read "()"
         ]
 
 
@@ -70,4 +78,12 @@ printTest =
             \_ ->
                 Expect.equal "(+ 1)" <|
                     print (OpApply Add [ Literal (FloatValue 1) ])
+        , test "print list" <|
+            \_ ->
+                Expect.equal "(1 2 3)" <|
+                    print (List [ Literal (FloatValue 1), Literal (FloatValue 2), Literal (FloatValue 3) ])
+        , test "print empty list" <|
+            \_ ->
+                Expect.equal "()" <|
+                    print (List [])
         ]
