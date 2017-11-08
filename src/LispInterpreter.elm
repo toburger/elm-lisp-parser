@@ -75,7 +75,7 @@ interpret env exp =
         Set (VarName name) exp ->
             interpret
                 (Dict.insert name exp env)
-                (floatLit 0)
+                (List [])
 
         Apply exp exps ->
             let
@@ -110,12 +110,18 @@ interpret env exp =
                     interpret env x
 
                 Nothing ->
-                    floatLit 0
+                    -- My LISP interpreter simply returns an empty list
+                    -- if a binding references an inexistent value.
+                    -- This may not be what you expect,
+                    -- but it can be helpful in situations where
+                    -- you have bindings in your lisp code, but your
+                    -- environment doesn't provide all the referenced values.
+                    List []
 
 
 env : Environment
 env =
-    Dict.fromList [ ( "test", floatLit 8 ) ]
+    Dict.fromList [ ( "foo", floatLit 8 ) ]
 
 
 samples : List String
@@ -126,8 +132,10 @@ samples =
     , "(min 3 45 0)"
     , "(max 3 45)"
     , "(1 2 3 4 5)"
-    , "test"
-    , "(+ (- 1 2) 3 test)"
+    , "foo"
+    , "(+ (- 1 2) 3 foo)"
+    , "bar"
+    , "(+ foo bar)"
     ]
 
 
